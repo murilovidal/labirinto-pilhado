@@ -1,16 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h> // malloc
-#include <locale.h>
-#include <unistd.h>
-
-//Define as cores
-#define VERMELHO "\x1b[31m"
-#define VERDE   "\x1b[32m"
-#define AMARELO "\x1b[33m"
-#define AZUL    "\x1b[34m"
-#define MAGENTA "\x1b[35m"
-#define CYAN    "\x1b[36m"
-#define RESET   "\x1b[0m"
 
 
 //Estruturas
@@ -18,7 +7,27 @@ typedef struct Nodo_Pilha
 {
          int coordenadas;
          struct Nodo_Pilha *prox;
-}*NODOPTR;
+         int tamanho;
+}Pilha;
+
+void InicializaPilha(Pilha **N)
+{
+  *N = NULL;
+} // inserindo NULL no ponteiro externo
+
+Pilha *Aloca()
+{
+  Pilha *p;
+
+  p = (Pilha*)malloc(sizeof(Pilha));
+
+  if(!p){
+    printf("Problema de alocacao\n");
+    exit(0);}
+
+  return p;
+}
+
 
 void zera_Matriz(int Labirinto[30][30])
 {
@@ -29,7 +38,7 @@ void zera_Matriz(int Labirinto[30][30])
 }
 
 //Recebe uma matriz 30x30 e configura as paredes, a entrada e a saída do labirinto
-void Novo_Labirinto(int Labirinto[30][30])
+void Novo_Labirinto(int Labirinto[30][30], int *coordenadas)
 {
   int i, j, r;
   //Laterais
@@ -57,12 +66,14 @@ void Novo_Labirinto(int Labirinto[30][30])
   r = (rand()%28)+1;
   Labirinto[r][0] = 0;
   printf(" %d\n", r );
+
+  *coordenadas = r*100+1;//atribui as coordenadas iniciais à variável coordenadas
   r = (rand()%28)+1;
   printf(" %d\n", r );
   Labirinto[r][29] = 0;
 }
 
-void Exibe_Labirinto(int Labirinto[30][30])//Desenha o labirinto na tela
+void Exibe_Labirinto(int Labirinto[30][30], int coordenadas)//Desenha o labirinto na tela
 {
   int i, j;
   system("clear");
@@ -78,7 +89,7 @@ void Exibe_Labirinto(int Labirinto[30][30])//Desenha o labirinto na tela
       else if (Labirinto[i][j] == 2)
       {
         printf("\033[%d;%dH", i, j);
-        printf("☺");
+        printf("·");
       }
       else if (Labirinto[i][j] == 3)
       {
@@ -86,19 +97,10 @@ void Exibe_Labirinto(int Labirinto[30][30])//Desenha o labirinto na tela
         printf("░");
       }
     }
+    //imprimir a posição do personagem
+    printf("\033[%d;%dH", div(coordenadas, 100), coordenadas%100);
+    printf("☺");
   }
-  /*livre: será representada por um espaço em branco;
-▪
-parede: será representada por um bloco sólido (ASCII 219);
-▪
-visitada: será representada por um ponto;
-▪
-beco: será representada por um bloco pontilhado (ASCII 176);
-▪
-posição em que o rato se encontra no labirinto, no momento em que ele é exibido:
-será representada pelo caracter -
-ASCII 1  (carinha feliz)*/
-
 }
 
 
@@ -107,12 +109,18 @@ void size()//Retorna o tamanho da pilha
 {
 
 }
-void push()//Inclui elemento na pilha
+void push(int coordenadas, Pilha ***ppp)//Inclui elemento na pilha
 {
-
+  Pilha *novo;
+  novo = Aloca();
+  // Alocacao do dado na lista que representa uma pilha
+  novo->coordenadas = coordenadas;
+  novo->prox = **ppp;
+  // Atualizando endereco do ponteiro externo que esta lá na main
+  **ppp = novo; // mais uma vez a indireção
 }
 
-void pop()//Exclui elemento da pilha e retorna suas coordenadas
+void pop(Pilha **P, int *coordenadas)//Exclui elemento da pilha e retorna suas coordenadas
 {
 
 }
@@ -122,16 +130,32 @@ void stack_pop()//Retorna as coordenadas do elemento que está no topo da pilha 
 
 }
 
+int onde_ir(int Labirinto[30][30], int onde_estou)
+{
+    return 0;
+}
+
 void main()
 {
-  setlocale(LC_ALL, "Portuguese");//habilita a acentuação para o português
   //Variáveis
   int Labirinto[30][30];  /*0 - Livre
                             1 - Parede
                             2 - Visitada
                             3 - Beco*/
-  zera_Matriz(Labirinto);
-  Novo_Labirinto(Labirinto);
-  Exibe_Labirinto(Labirinto);
+  int onde_estou, onde_ir;
+  Pilha *pep; // pep = ponteiro externo para pilha
 
+  InicializaPilha(&pep);
+
+  zera_Matriz(Labirinto);
+  Novo_Labirinto(Labirinto, &onde_estou);
+  onde_ir = onde_ir(Labirinto, onde_estou);
+
+  Exibe_Labirinto(Labirinto, onde_estou);
+
+
+
+
+
+  printf("\033[%d;%dH", 30, 30);
 }
