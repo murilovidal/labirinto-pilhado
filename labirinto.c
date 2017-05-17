@@ -1,19 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h> // malloc
-
+#include <time.h> // time
 
 //Estruturas
 typedef struct Nodo_Pilha
 {
          int coordenadas;
          struct Nodo_Pilha *prox;
-         int tamanho;
 }Pilha;
 
-void InicializaPilha(Pilha **N)
-{
-  *N = NULL;
-} // inserindo NULL no ponteiro externo
+void InicializaPilha(Pilha **N){*N = NULL;} // inserindo NULL no ponteiro externo
 
 Pilha *Aloca()
 {
@@ -28,7 +24,6 @@ Pilha *Aloca()
   return p;
 }
 
-
 void zera_Matriz(int Labirinto[30][30])
 {
   int i,j;
@@ -37,8 +32,7 @@ void zera_Matriz(int Labirinto[30][30])
       Labirinto[i][j] = 0;
 }
 
-//Recebe uma matriz 30x30 e configura as paredes, a entrada e a saída do labirinto
-void Novo_Labirinto(int Labirinto[30][30], int *coordenadas)
+void Novo_Labirinto(int Labirinto[30][30], int *coordenadas_rato, int *coordenadas_saida) //Recebe uma matriz 30x30 e configura as paredes, a entrada e a saída do labirinto
 {
   int i, j, r;
   //Laterais
@@ -50,7 +44,7 @@ void Novo_Labirinto(int Labirinto[30][30], int *coordenadas)
     Labirinto[0][i] = 1;
     Labirinto[i][0] = 1;
   }
-  for (i = 2; i < 29; i++)//gera as paredes internas aleatoriamente
+  for (i = 2; i < 29; i++) //gera as paredes internas aleatoriamente
   {
     for (j = 2; j < 29; j++)
     {
@@ -62,18 +56,34 @@ void Novo_Labirinto(int Labirinto[30][30], int *coordenadas)
     }
   }
 
-  //definir entrada e saída do labirinto***COM PROBLEMA, ÀS VEZES NÃO EXIBE UMA ENTRADA OU SAÍDA, PODE SER PROBLEMA NO Exibe_Labirinto
+  //definir entrada do labirinto ***TALVEZ COM PROBLEMA, ÀS VEZES NÃO EXIBE UMA ENTRADA OU SAÍDA, PODE SER PROBLEMA NO Exibe_Labirinto
   r = (rand()%28) + 2;
   Labirinto[r][0] = 0;
+  while((Labirinto[r][1] != 0) || (Labirinto[r][2] != 0) || (Labirinto[r][3] != 0) || (r == 29))
+  {
+    Labirinto[r][0] = 1;
+    r = (rand()%28) + 2;
+    Labirinto[r][0] = 0;
+  }
   printf(" %d\n", r );
+  *coordenadas_rato = r*100+1; //atribui as coordenadas iniciais à variável coordenadas
 
-  *coordenadas = r*100+1;//atribui as coordenadas iniciais à variável coordenadas
+  //definir saida do labirinto ***TALVEZ COM PROBLEMA, ÀS VEZES NÃO EXIBE UMA ENTRADA OU SAÍDA, PODE SER PROBLEMA NO Exibe_Labirinto
   r = (rand()%28)+2;
-  printf(" %d\n", r );
   Labirinto[r][29] = 0;
+  while((Labirinto[r][28] != 0) || (Labirinto[r][27] != 0) || (Labirinto[r][26] != 0) || (r == 29))
+  {
+    Labirinto[r][29] = 1;
+    r = (rand()%28) + 2;
+    Labirinto[r][29] = 0;
+  }
+
+  *coordenadas_saida = r*100+29;
+  printf(" %d\n", r);
+
 }
 
-void Exibe_Labirinto(int Labirinto[30][30], int coordenadas)//Desenha o labirinto na tela
+void Exibe_Labirinto(int Labirinto[30][30], int coordenadas) //Desenha o labirinto na tela
 {
   int i, j;
   system("clear");
@@ -97,85 +107,125 @@ void Exibe_Labirinto(int Labirinto[30][30], int coordenadas)//Desenha o labirint
         printf("░");
       }
     }
-    //imprimir a posição do personagem
-    printf("\033[%d;%dH", div(coordenadas, 100), coordenadas%100);
-    printf("☺");
   }
+  //imprimir a posição do personagem
+  printf("\033[%d;%dH", div(coordenadas, 100), coordenadas%100);
+  printf("☺");
 }
 
-
-//Funções da pilha
-void size()//Retorna o tamanho da pilha
+void size() //Retorna o tamanho da pilha
 {
 
 }
-void push(int coordenadas, Pilha ***ppp)//Inclui elemento na pilha
+void push(int coordenadas, Pilha **p) //Inclui elemento na pilha
 {
   Pilha *novo;
-  novo = Aloca();
-  // Alocacao do dado na lista que representa uma pilha
+  novo = Aloca(); // Alocacao do dado na lista que representa uma pilha
   novo->coordenadas = coordenadas;
-  novo->prox = **ppp;
-  // Atualizando endereco do ponteiro externo que esta lá na main
-  **ppp = novo; // mais uma vez a indireção
+  novo->prox = *p;
+  *p = novo;
 }
 
-void pop(Pilha **P, int *coordenadas)//Exclui elemento da pilha e retorna suas coordenadas
+void pop(Pilha **P) //Exclui elemento da pilha
+{
+  if((*P) == NULL)
+    printf("Ops! Pilha esta vazia.\n");
+
+  Pilha *aux = (*P);
+  *P = (*P)->prox;
+  free(aux);
+}
+
+void stack_pop(Pilha **P) //Retorna as coordenadas do elemento que está no topo da pilha sem desempilhar
 {
 
 }
 
-void stack_pop()//Retorna as coordenadas do elemento que está no topo da pilha sem desempilhar
+void Atualiza_Labirinto(int Labirinto[30][30], int i, int j, int situacao) //recebe o labirinto, coordenadas e situação para atualizar a célula
 {
 
 }
 
-void Atualiza_Labirinto(int Labirinto[30][30], int coordenadas, int situacao)
-//recebe o labirinto, coordenadas e situação para atualizar a célula
+int onde_ir(int Labirinto[30][30], int onde_estou, Pilha **P)
 {
-   	
-}
+  // Recebe o labirinto e a posição do objeto e retorna a coordenada que deve ser seguida
+  // Essa função deve chamar Atualiza_Labirinto pra já atualizar onde encontrar paredes
 
-int onde_ir(int Labirinto[30][30], int onde_estou)
-//recebe o labirinto e a posição do objeto e retorna a coordenada que deve ser seguida
-//Essa função deve chamar Atualiza_Labirinto pra já atualizar onde encontrar paredes
-{
-  int i, j;
-  div_t resto;
-  i = onde_estou%100;
-  resto = div(onde_estou, 100);
-  j = resto.rem;
-  
-  while(i>30 || j>30)
-  {
-    
+  int i, j; // posicao i e j do rato
+
+  i = onde_estou/100;
+  j = onde_estou%100;
+
+  if(Labirinto[i][j+1] == 0){
+    printf("\033[%d;%dH", 30, 30);
+    printf("entrou no primeiro\n");
+    push((i*100)+(j+1), P);
+    Labirinto[i][j+1] = 2;
   }
-  //onde_estou = onde_estou + 101;
+  else if(Labirinto[i-1][j] == 0){
+    printf("\033[%d;%dH", 30, 30);
+    printf("entrou no segundo\n");
+    push(((i-1)*100)+j, P);
+    Labirinto[i-1][j] = 2;
+  }
+  else if(Labirinto[i+1][j] == 0){
+    printf("\033[%d;%dH", 30, 30);
+    printf("entrou no terceiro\n");
+    push(((i+1)*100)+j, P);
+    Labirinto[i+1][j] = 2;
+  }
+  else if(Labirinto[i][j-1] == 0){
+    printf("\033[%d;%dH", 30, 30);
+    printf("entrou no quarto\n");
+    push((i*100)+(j-1), P);
+    Labirinto[i][j-1] = 2;
+  }
+  else{
+    printf("\033[%d;%dH", 30, 30);
+    printf("entrou no else\n");
+    pop(P);
+    Labirinto[i][j] = 3;
+  }
+
+
+  //printf("\033[%d;%dH", 30, 30);
+  //printf("\ni: %d, j: %d\n", i,j);
+
+  onde_estou = (*P)->coordenadas;
+
+
+  i = onde_estou/100;
+  j = onde_estou%100;
+
+  //printf("\nonde_estou novo: %d\n", onde_estou);
+  //printf("\nnovo i: %d, novo j: %d\n", i,j);
+
   return onde_estou;
 }
 
 void main()
 {
   //Variáveis
+  Pilha *pep; // pep = ponteiro externo para pilha
+  int onde_estou, ondeir, saida, qq;
   int Labirinto[30][30];  /*0 - Livre
                             1 - Parede
                             2 - Visitada
                             3 - Beco*/
-  int onde_estou, ondeir, final;
-  Pilha *pep; // pep = ponteiro externo para pilha
-
-
-
   InicializaPilha(&pep);
   zera_Matriz(Labirinto);
-  Novo_Labirinto(Labirinto, &onde_estou);
-  onde_estou = onde_ir(Labirinto, onde_estou);
-  
+  Novo_Labirinto(Labirinto, &onde_estou, &saida);
+
+  printf("onde_estou: %d, saida: %d\n", onde_estou, saida);
+
   Exibe_Labirinto(Labirinto, onde_estou);
+  printf("\033[%d;%dH", 30, 30);
 
-
-
-
+  while(onde_estou != saida){
+    onde_estou = onde_ir(Labirinto, onde_estou, &pep);
+    getchar();
+    Exibe_Labirinto(Labirinto, onde_estou);
+  }
 
   printf("\033[%d;%dH", 30, 30);
 }
