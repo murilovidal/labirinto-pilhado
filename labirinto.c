@@ -63,12 +63,12 @@ void Novo_Labirinto(int Labirinto[30][30], int *coordenadas)
   }
 
   //definir entrada e saída do labirinto***COM PROBLEMA, ÀS VEZES NÃO EXIBE UMA ENTRADA OU SAÍDA, PODE SER PROBLEMA NO Exibe_Labirinto
-  r = (rand()%28)+1;
+  r = (rand()%28) + 2;
   Labirinto[r][0] = 0;
   printf(" %d\n", r );
 
   *coordenadas = r*100+1;//atribui as coordenadas iniciais à variável coordenadas
-  r = (rand()%28)+1;
+  r = (rand()%28)+2;
   printf(" %d\n", r );
   Labirinto[r][29] = 0;
 }
@@ -130,9 +130,28 @@ void stack_pop()//Retorna as coordenadas do elemento que está no topo da pilha 
 
 }
 
-int onde_ir(int Labirinto[30][30], int onde_estou)
+void Atualiza_Labirinto(int Labirinto[30][30], int coordenadas, int situacao)
+//recebe o labirinto, coordenadas e situação para atualizar a célula
 {
-    return 0;
+   	
+}
+
+int onde_ir(int Labirinto[30][30], int onde_estou)
+//recebe o labirinto e a posição do objeto e retorna a coordenada que deve ser seguida
+//Essa função deve chamar Atualiza_Labirinto pra já atualizar onde encontrar paredes
+{
+  int i, j;
+  div_t resto;
+  i = onde_estou%100;
+  resto = div(onde_estou, 100);
+  j = resto.rem;
+  
+  while(i>30 || j>30)
+  {
+    
+  }
+  //onde_estou = onde_estou + 101;
+  return onde_estou;
 }
 
 void main()
@@ -142,15 +161,16 @@ void main()
                             1 - Parede
                             2 - Visitada
                             3 - Beco*/
-  int onde_estou, onde_ir;
+  int onde_estou, ondeir, final;
   Pilha *pep; // pep = ponteiro externo para pilha
 
-  InicializaPilha(&pep);
 
+
+  InicializaPilha(&pep);
   zera_Matriz(Labirinto);
   Novo_Labirinto(Labirinto, &onde_estou);
-  onde_ir = onde_ir(Labirinto, onde_estou);
-
+  onde_estou = onde_ir(Labirinto, onde_estou);
+  
   Exibe_Labirinto(Labirinto, onde_estou);
 
 
