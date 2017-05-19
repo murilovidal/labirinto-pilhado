@@ -44,6 +44,7 @@ void Novo_Labirinto(int Labirinto[30][30], int *coordenadas_rato, int *coordenad
     Labirinto[0][i] = 1;
     Labirinto[i][0] = 1;
   }
+
   for (i = 2; i < 29; i++) //gera as paredes internas aleatoriamente
   {
     for (j = 2; j < 29; j++)
@@ -56,6 +57,7 @@ void Novo_Labirinto(int Labirinto[30][30], int *coordenadas_rato, int *coordenad
     }
   }
 
+
   //definir entrada do labirinto ***TALVEZ COM PROBLEMA, ÀS VEZES NÃO EXIBE UMA ENTRADA OU SAÍDA, PODE SER PROBLEMA NO Exibe_Labirinto
   r = (rand()%28) + 2;
   Labirinto[r][0] = 0;
@@ -66,7 +68,7 @@ void Novo_Labirinto(int Labirinto[30][30], int *coordenadas_rato, int *coordenad
     Labirinto[r][0] = 0;
   }
   printf(" %d\n", r );
-  *coordenadas_rato = r*100+1; //atribui as coordenadas iniciais à variável coordenadas
+  *coordenadas_rato = r*100; //atribui as coordenadas iniciais à variável coordenadas
 
   //definir saida do labirinto ***TALVEZ COM PROBLEMA, ÀS VEZES NÃO EXIBE UMA ENTRADA OU SAÍDA, PODE SER PROBLEMA NO Exibe_Labirinto
   r = (rand()%28)+2;
@@ -93,23 +95,23 @@ void Exibe_Labirinto(int Labirinto[30][30], int coordenadas) //Desenha o labirin
     {
       if (Labirinto[i][j] == 1)
       {
-        printf("\033[%d;%dH", i, j);
+        printf("\033[%d;%dH", i+1, j+1); // printf("\033[%d;%dH", i, j);
         printf("█");
       }
       else if (Labirinto[i][j] == 2)
       {
-        printf("\033[%d;%dH", i, j);
+        printf("\033[%d;%dH", i+1, j+1);  // printf("\033[%d;%dH", i, j);
         printf("·");
       }
       else if (Labirinto[i][j] == 3)
       {
-        printf("\033[%d;%dH", i, j);
+        printf("\033[%d;%dH", i+1, j+1); // printf("\033[%d;%dH", i, j);
         printf("░");
       }
     }
   }
   //imprimir a posição do personagem
-  printf("\033[%d;%dH", div(coordenadas, 100), coordenadas%100);
+  printf("\033[%d;%dH", (coordenadas/100)+1, (coordenadas%100)+1);
   printf("☺");
 }
 
@@ -156,25 +158,25 @@ int onde_ir(int Labirinto[30][30], int onde_estou, Pilha **P)
   i = onde_estou/100;
   j = onde_estou%100;
 
-  if(Labirinto[i][j+1] == 0){
+  if(Labirinto[i][j+1] == 0){ // (Labirinto[i][j+1] == 0)
     printf("\033[%d;%dH", 30, 30);
     printf("entrou no primeiro\n");
     push((i*100)+(j+1), P);
     Labirinto[i][j+1] = 2;
   }
-  else if(Labirinto[i-1][j] == 0){
+  else if(Labirinto[i-1][j] == 0){ // (Labirinto[i-1][j] == 0)
     printf("\033[%d;%dH", 30, 30);
     printf("entrou no segundo\n");
     push(((i-1)*100)+j, P);
     Labirinto[i-1][j] = 2;
   }
-  else if(Labirinto[i+1][j] == 0){
+  else if(Labirinto[i+1][j] == 0){ // (Labirinto[i+1][j] == 0)
     printf("\033[%d;%dH", 30, 30);
     printf("entrou no terceiro\n");
     push(((i+1)*100)+j, P);
     Labirinto[i+1][j] = 2;
   }
-  else if(Labirinto[i][j-1] == 0){
+  else if(Labirinto[i][j-1] == 0){ // (Labirinto[i][j-1] == 0)
     printf("\033[%d;%dH", 30, 30);
     printf("entrou no quarto\n");
     push((i*100)+(j-1), P);
@@ -188,7 +190,17 @@ int onde_ir(int Labirinto[30][30], int onde_estou, Pilha **P)
   }
 
 
-  //printf("\033[%d;%dH", 30, 30);
+  printf("\033[%d;%dH", 30, 30);
+  printf("\n");
+
+  /*int m, n;
+
+  for(m=0; m<30; m++){
+    printf("\n");
+    for(n=0; n<30; n++)
+      printf("%d ", Labirinto[m][n]);
+  }*/
+
   //printf("\ni: %d, j: %d\n", i,j);
 
   onde_estou = (*P)->coordenadas;
